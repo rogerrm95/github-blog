@@ -1,0 +1,44 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ['./src/**/*.tsx'],
+  theme: {
+    extend: {
+      fontFamily: {
+        'sans': ["Nunito", 'san-serif'],
+        'header': ["Coda", 'san-serif'],
+      },
+      backgroundColor: {
+        'zinc-900': '#040F1A',
+        'zinc-800': '#071422',
+        'zinc-700': '#0B1B2B',
+        'zinc-600': '#112131',
+        'zinc-500': '#1C2F41',
+        'zinc-400': '#3A536B',
+        'zinc-300': '#7B96B2',
+        'zinc-200': '#AFC2D4',
+        'zinc-100': '#C4D4E3',
+        'zinc-50': '#E7EDF4',
+
+        'blue-500': '#3294F8'
+      },
+      colors: {
+        'zinc-900': '#040F1A',
+        'zinc-800': '#071422',
+        'zinc-700': '#0B1B2B',
+        'zinc-600': '#112131',
+        'zinc-500': '#1C2F41',
+        'zinc-400': '#3A536B',
+        'zinc-300': '#7B96B2',
+        'zinc-200': '#AFC2D4',
+        'zinc-100': '#C4D4E3',
+        'zinc-50': '#E7EDF4',
+
+        'blue-500': '#3294F8'
+      },
+      backgroundImage: {
+        header: 'url(/background.png)'
+      }
+    },
+  },
+  plugins: [],
+}
