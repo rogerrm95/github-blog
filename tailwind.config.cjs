@@ -37,6 +37,9 @@ module.exports = {
       },
       backgroundImage: {
         header: 'url(/background.png)'
+      },
+      boxShadow: {
+        'box': '0px 2px 28px rgba(0, 0, 0, 0.2)'
       }
     },
   },
