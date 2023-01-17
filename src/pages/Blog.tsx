@@ -5,16 +5,64 @@ import axios from "axios"
 import { FaGithub, FaUsers, FaBuilding, FaLink } from 'react-icons/fa'
 import { Header } from '../components/Header'
 
+interface User {
+  name: string
+  username: string
+  bio: string
+  company: string
+  followers: number
+  avatarURL: string,
+}
+
+interface Issues {
+  totalCount: number,
+  items: Item[]
+}
+
+type Item = {
+  // body title updatedAt comments
+  body: string
+  title: string
+  updatedAt: string
+}
+
 export function Blog() {
-  useEffect(() => {
-    loadUser()
-  }, [])
+  const [user, setUser] = useState({} as User)
+  const [issues, setIssues] = useState({} as Issues)
 
-  async function loadUser() {
-    const data = await axios.get(`https://api.github.com/users/rogerrm95`).then(res => res.data)
+  async function loadGitHubUserInfo() {
+    try {
+      await axios.get(`https://api.github.com/users/rogerrm95`).then(res => {
 
-    console.log(data)
+        setUser({
+          ...res.data,
+          username: res.data.login,
+          avatarURL: res.data.avatar_url
+        })
+      })
+    } catch (error) {
+      alert("Error !!")
+    }
   }
+
+  async function loadGitHubIssues() {
+    try {
+      const queryString = 'q=' + encodeURIComponent(`user:rogerrm95 is:issue`)
+      await axios.get(`https://api.github.com/search/issues?${queryString}`).then(res => {
+        setIssues({
+          items: res.data.items,
+          totalCount: res.data.total_count
+        })
+      })
+    } catch {
+      alert("Error !!")
+    }
+  }
+
+  useEffect(() => {
+    loadGitHubUserInfo()
+    loadGitHubIssues()
+  }, [])
 
   return (
     <div className='h-screen w-full max-w-[1440px] mx-auto'>
@@ -28,15 +76,15 @@ export function Blog() {
           {/* PHOTO */}
           <img
             className='w-[148px] h-[148px] rounded-lg'
-            src="https://avatars.githubusercontent.com/u/56278484?v=4"
+            src={user.avatarURL}
             alt="Foto de Perfil"
-            title='Roger Marques...' />
+            title={user.name} />
 
           {/* USER INFO */}
           <div className='flex flex-col gap-2 w-full'>
             <div className='flex flex-col gap-1 sm:flex-row justify-between hover:underline'>
               <h2 className='text-zinc-50 text-2xl font-bold'>
-                Roger Marques
+                {user.name}
               </h2>
 
               <Link
@@ -48,24 +96,23 @@ export function Blog() {
             </div>
 
             <p className='text-zinc-200 hidden md:block'>
-              Tristique volutpat pulvinar vel massa, pellentesque egestas.
-              Eu viverra massa quam dignissim aenean malesuada suscipit. Nunc, volutpat pulvinar vel mass.
+              {user.bio}
             </p>
 
             <footer className='mt-auto flex flex-col gap-2 md:flex-row md:gap-6'>
               <div className='flex items-center gap-2'>
                 <FaGithub size={18} className='text-zinc-400' />
-                <span className='text-zinc-100'>rogerrm95</span>
+                <span className='text-zinc-100'>{user.username}</span>
               </div>
 
               <div className='flex items-center gap-2'>
                 <FaBuilding size={18} className='text-zinc-400' />
-                <span className='text-zinc-100'>Planneta Educação</span>
+                <span className='text-zinc-100'>{user.company}</span>
               </div>
 
               <div className='flex items-center gap-2'>
                 <FaUsers size={18} className='text-zinc-400' />
-                <span className='text-zinc-100'>4 Seguidores</span>
+                <span className='text-zinc-100'>{user.followers} Seguidor (es)</span>
               </div>
             </footer>
           </div>
@@ -81,7 +128,7 @@ export function Blog() {
               </h2>
 
               <span className='text-zinc-400 text-sm'>
-                6 publicações
+                {issues.totalCount}
               </span>
             </div>
 
@@ -94,24 +141,33 @@ export function Blog() {
 
           {/* LISTA DE POSTS */}
           <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mb-4'>
-            <Link className='bg-zinc-700 h-[260px] p-8 flex flex-col gap-5 rounded-[10px]' to='/post'>
-              <header className='flex items-center justify-between gap-6'>
-                <h3 className='text-zinc-50 text-xl font-bold'>
-                  JavaScript data types and data structures
-                </h3>
+            {
+              issues.totalCount >= 0 ? issues.items.map(item => (
+                <Link className='bg-zinc-700 h-[260px] p-8 flex flex-col gap-5 rounded-[10px]' to='/post' key={item.title}>
+                  <header className='flex items-center justify-between gap-6'>
+                    <h3 className='text-zinc-50 text-xl font-bold'>
+                      {
+                        item.title
+                      }
+                    </h3>
 
-                <span className='text-zinc-300 text-xs w-[100px] text-center'>
-                  Há 3 dias
-                </span>
-              </header>
+                    <span className='text-zinc-300 text-xs w-[100px] text-center'>
+                      Há 3 dias
+                    </span>
+                  </header>
 
-              <p className='text-zinc-100 leading-relaxed line-clamp select-none'>
-                Programming languages all have built-in data structures, but these often differ from one language to another.
-                This article attempts to list the built-in data structures available in JavaScript and what properties they have.
-                These can be used to build other data structures. Wherever possible, comparisons with other languages are drawn.
-              </p>
-            </Link>
+                  <p className='text-zinc-100 leading-relaxed line-clamp select-none'>
+                    {item.body}
+                  </p>
+                </Link>
+              )) : (
+                <>
+                </>
+              )
+            }
+
           </div>
+
         </section>
       </main>
     </div>
