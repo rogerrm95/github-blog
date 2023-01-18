@@ -1,67 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import axios from "axios"
+import { useGithub } from '../hooks/useGithub'
 
+// Icons //
 import { FaGithub, FaUsers, FaBuilding, FaLink } from 'react-icons/fa'
+// Componente //
 import { Header } from '../components/Header'
 
-interface User {
-  name: string
-  username: string
-  bio: string
-  company: string
-  followers: number
-  avatarURL: string,
-}
-
-interface Issues {
-  totalCount: number,
-  items: Item[]
-}
-
-type Item = {
-  // body title updatedAt comments
-  body: string
-  title: string
-  updatedAt: string
-}
-
 export function Blog() {
-  const [user, setUser] = useState({} as User)
-  const [issues, setIssues] = useState({} as Issues)
-
-  async function loadGitHubUserInfo() {
-    try {
-      await axios.get(`https://api.github.com/users/rogerrm95`).then(res => {
-
-        setUser({
-          ...res.data,
-          username: res.data.login,
-          avatarURL: res.data.avatar_url
-        })
-      })
-    } catch (error) {
-      alert("Error !!")
-    }
-  }
-
-  async function loadGitHubIssues() {
-    try {
-      const queryString = 'q=' + encodeURIComponent(`user:rogerrm95 is:issue`)
-      await axios.get(`https://api.github.com/search/issues?${queryString}`).then(res => {
-        setIssues({
-          items: res.data.items,
-          totalCount: res.data.total_count
-        })
-      })
-    } catch {
-      alert("Error !!")
-    }
-  }
+  const { issues, user, loadGitHubUserInfo } = useGithub()
 
   useEffect(() => {
-    loadGitHubUserInfo()
-    loadGitHubIssues()
+    loadGitHubUserInfo('rogerrm95')
   }, [])
 
   return (
@@ -112,7 +62,7 @@ export function Blog() {
 
               <div className='flex items-center gap-2'>
                 <FaUsers size={18} className='text-zinc-400' />
-                <span className='text-zinc-100'>{user.followers} Seguidor (es)</span>
+                <span className='text-zinc-100'>{user.followers} Seguidor(es)</span>
               </div>
             </footer>
           </div>
@@ -133,7 +83,7 @@ export function Blog() {
             </div>
 
             <input
-              className='bg-zinc-900 py-3 px-4 rounded-lg placeholder:text-zinc-400 focus:outline-blue-500 outline-none caret-blue-500'
+              className='bg-zinc-900 py-3 px-4 rounded-lg placeholder:text-zinc-400 focus:outline-blue-500 outline-none caret-blue-500 w-full h-full'
               type="text"
               name="post-name"
               placeholder='Buscar conteúdo' />
@@ -143,7 +93,7 @@ export function Blog() {
           <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mb-4'>
             {
               issues.totalCount >= 0 ? issues.items.map(item => (
-                <Link className='bg-zinc-700 h-[260px] p-8 flex flex-col gap-5 rounded-[10px]' to='/post' key={item.title}>
+                <Link className='bg-zinc-700 h-[260px] p-8 flex flex-col gap-5 rounded-[10px]' to={`/post/${item.number}`} key={item.title}>
                   <header className='flex items-center justify-between gap-6'>
                     <h3 className='text-zinc-50 text-xl font-bold'>
                       {

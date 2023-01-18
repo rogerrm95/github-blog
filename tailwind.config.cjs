@@ -19,7 +19,8 @@ module.exports = {
         'zinc-100': '#C4D4E3',
         'zinc-50': '#E7EDF4',
 
-        'blue-500': '#3294F8'
+        'blue-500': '#3294F8',
+        'blue-700': '#0879ed'
       },
       colors: {
         'zinc-900': '#040F1A',
@@ -33,7 +34,8 @@ module.exports = {
         'zinc-100': '#C4D4E3',
         'zinc-50': '#E7EDF4',
 
-        'blue-500': '#3294F8'
+        'blue-500': '#3294F8',
+        'blue-700': '#0879ed'
       },
       backgroundImage: {
         header: 'url(/background.png)'
