@@ -4,7 +4,7 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 interface GithubContextData {
     user: User,
     issues: Issues
-    loadGitHubUserInfo: (username: string) => void
+    loadGitHubUserInfo: (username: string) => Promise<void>
 }
 
 type User = {
@@ -25,7 +25,8 @@ type Item = {
     // body title updatedAt comments
     body: string
     title: string
-    updatedAt: string
+    updatedAt: string,
+    number: number
 }
 
 
@@ -36,24 +37,8 @@ interface GithubContextProviderData {
 }
 
 export function GithubContextProvider({ children }: GithubContextProviderData) {
-    const [user, setUser] = useState(() => {
-        const userData = localStorage.getItem('@github-blog:user')
-
-        if (userData) {
-            return JSON.parse(userData)
-        }
-
-        return {} as User
-    })
-    const [issues, setIssues] = useState(() => {
-        const issuesData = localStorage.getItem('@github-blog:issues')
-
-        if (issuesData) {
-            return JSON.parse(issuesData)
-        }
-
-        return {} as Issues
-    })
+    const [user, setUser] = useState({} as User)
+    const [issues, setIssues] = useState({} as Issues)
 
     async function loadGitHubUserInfo(username: string) {
         try {
@@ -67,28 +52,19 @@ export function GithubContextProvider({ children }: GithubContextProviderData) {
 
             const queryString = 'q=' + encodeURIComponent(`user:rogerrm95 is:issue`)
             await axios.get(`https://api.github.com/search/issues?${queryString}`).then(res => {
+                console.log(res.data)
                 setIssues({
                     items: res.data.items,
                     totalCount: res.data.total_count
                 })
             })
-
-            saveGithubInfoInLocalStorage(user, issues)
         } catch (error) {
             alert("Error !!")
         }
     }
 
-    function saveGithubInfoInLocalStorage(user: User, issues: Issues) {
-        const userJSON = JSON.stringify(user)
-        const issuesJSON = JSON.stringify(issues)
-
-        localStorage.setItem('@github-blog:user', userJSON)
-        localStorage.setItem('@github-blog:issues', issuesJSON)
-    }
-
     return (
-        <GithubContext.Provider value={{ user, issues, loadGitHubUserInfo}}>
+        <GithubContext.Provider value={{ user, issues, loadGitHubUserInfo }}>
             {children}
         </GithubContext.Provider>
     )
