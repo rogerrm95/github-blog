@@ -16,16 +16,15 @@ type User = {
     avatarURL: string,
 }
 
-type Issues = {
+export type Issues = {
     totalCount: number,
     items: Item[]
 }
 
 type Item = {
-    // body title updatedAt comments
     body: string
     title: string
-    updatedAt: string,
+    updatedAt: Date,
     number: number
 }
 
@@ -52,9 +51,18 @@ export function GithubContextProvider({ children }: GithubContextProviderData) {
 
             const queryString = 'q=' + encodeURIComponent(`user:rogerrm95 is:issue`)
             await axios.get(`https://api.github.com/search/issues?${queryString}`).then(res => {
-                console.log(res.data)
+
+                const items = res.data.items.map((item: any) => {
+                    return {
+                        body: item.body,
+                        title: item.title,
+                        updatedAt: item.updated_at,
+                        number: item.number
+                    }
+                })
+
                 setIssues({
-                    items: res.data.items,
+                    items: items,
                     totalCount: res.data.total_count
                 })
             })

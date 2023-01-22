@@ -6,6 +6,7 @@ import { useGithub } from '../hooks/useGithub'
 import { FaGithub, FaUsers, FaBuilding, FaLink } from 'react-icons/fa'
 // Componente //
 import { Header } from '../components/Header'
+import { Issue } from '../components/IssueItem'
 
 export function Blog() {
   const { issues, user, loadGitHubUserInfo } = useGithub()
@@ -78,7 +79,9 @@ export function Blog() {
               </h2>
 
               <span className='text-zinc-400 text-sm'>
-                {issues.totalCount}
+                {
+                  `${issues.totalCount} ${issues.totalCount === 1 ? 'Publicação' : 'Publicações'}`
+                }
               </span>
             </div>
 
@@ -93,23 +96,7 @@ export function Blog() {
           <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mb-4'>
             {
               issues.totalCount >= 0 ? issues.items.map(item => (
-                <Link className='bg-zinc-700 h-[260px] p-8 flex flex-col gap-5 rounded-[10px]' to={`/post/${item.number}`} key={item.title}>
-                  <header className='flex items-center justify-between gap-6'>
-                    <h3 className='text-zinc-50 text-xl font-bold'>
-                      {
-                        item.title
-                      }
-                    </h3>
-
-                    <span className='text-zinc-300 text-xs w-[100px] text-center'>
-                      Há 3 dias
-                    </span>
-                  </header>
-
-                  <p className='text-zinc-100 leading-relaxed line-clamp select-none'>
-                    {item.body}
-                  </p>
-                </Link>
+                <Issue key={item.number} data={item} />
               )) : (
                 <>
                 </>

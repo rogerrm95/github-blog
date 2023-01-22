@@ -1,14 +1,19 @@
 import { useEffect, useState } from "react";
+// Libs //
 import { Link, useParams } from "react-router-dom";
 import Markdown from 'react-markdown'
 import axios from "axios";
+import { formatDistanceToNow, format } from 'date-fns'
+import ptBR from 'date-fns/locale/pt-BR'
+// Icons //
 import { FaArrowLeft, FaCalendar, FaComment, FaGithub, FaLink } from "react-icons/fa";
+// Components //
 import { Header } from "../components/Header";
 
 type Issue = {
     body: string
     title: string
-    updatedAt: string,
+    updatedAt: Date,
     number: number,
     comments: number,
     user: string,
@@ -22,9 +27,14 @@ export function Post() {
 
     async function loadIssueFromGithub() {
         await axios.get(`https://api.github.com/repos/rogerrm95/github-blog/issues/${id}`).then(res => {
+
+            console.log(new Date(res.data.updated_at))
             setIssue({
-                ...res.data,
-                updatedAt: res.data.updated_at,
+                body: res.data.body,
+                title: res.data.title,
+                comments: res.data.comments,
+                number: res.data.numbers,
+                updatedAt: new Date(res.data.updated_at),
                 user: res.data.user.login,
                 url: res.data.html_url
             })
@@ -34,6 +44,9 @@ export function Post() {
     useEffect(() => {
         loadIssueFromGithub()
     }, [])
+
+    const updatedAtDateFormatted = issue.updatedAt ? format(issue.updatedAt, "d 'de' LLLL 'ás' HH:mm'h'", { locale: ptBR }) : ''
+    const updatedAtDateRelativeToNow = issue.updatedAt ? formatDistanceToNow(issue.updatedAt, { locale: ptBR, addSuffix: true }) : ''
 
     return (
         <div className='h-screen w-full max-w-[1440px] mx-auto'>
@@ -65,7 +78,17 @@ export function Post() {
 
                         <div className='flex items-center gap-2'>
                             <FaCalendar size={18} className='text-zinc-400' />
-                            <span className='text-zinc-300'>{issue.updatedAt}</span>
+                            {
+                                issue.updatedAt ? (
+                                    <time dateTime={issue.updatedAt.toISOString()} title={updatedAtDateFormatted} className='text-zinc-300 first-letter:uppercase'>
+                                        {updatedAtDateRelativeToNow}
+                                    </time>
+                                ) : (
+                                    <span className='text-zinc-300'>
+                                        -
+                                    </span>
+                                )
+                            }
                         </div>
 
                         <div className='flex items-center gap-2'>
@@ -75,7 +98,7 @@ export function Post() {
                     </footer>
                 </section>
 
-                <Markdown linkTarget={"_blank"} className='px-8 leading-relaxed text-justify text-zinc-200 flex flex-col gap-6'>
+                <Markdown linkTarget={"_blank"} className='px-8 leading-relaxed text-justify text-zinc-200 flex flex-col gap-6 mb-8'>
                     {issue.body}
                 </Markdown>
             </main>
