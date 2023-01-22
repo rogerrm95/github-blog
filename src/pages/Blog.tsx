@@ -38,12 +38,12 @@ export function Blog() {
                 {user.name}
               </h2>
 
-              <Link
+              <a
                 className='text-blue-500 flex items-center gap-2 text-xs font-bold'
-                to="/">
+                href="https://github.com/rogerrm95">
                 GITHUB
                 <FaLink size={12} />
-              </Link>
+              </a>
             </div>
 
             <p className='text-zinc-200 hidden md:block'>
@@ -107,6 +107,6 @@ export function Blog() {
 
         </section>
       </main>
-    </div>
+    </div >
   )
 }
